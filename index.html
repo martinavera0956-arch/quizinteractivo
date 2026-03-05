@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CITOESQUELETO QUIZ</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --panel: #111128;
+    --border: #2a2a5a;
+    --accent1: #00f5d4;
+    --accent2: #f72585;
+    --accent3: #7b2ff7;
+    --accent4: #ffd60a;
+    --text: #e8e8ff;
+    --muted: #6666aa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #cytoskeleton-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* SCREEN: INTRO */
+  #screen-intro {
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+
+  .dna-icon {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 20px;
+    animation: spin 4s linear infinite;
+  }
+  @keyframes spin {
+    0%, 100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+  }
+
+  .main-title {
+    font-size: clamp(18px, 3vw, 28px);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent3), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -2px;
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .intro-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: left;
+  }
+
+  .intro-card h3 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent1);
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 16px;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .rule-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .rule-item span:first-child {
+    font-size: 20px;
+  }
+
+  /* Name input */
+  .name-section {
+    margin-bottom: 30px;
+  }
+
+  .name-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+
+  .name-input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .name-input:focus {
+    border-color: var(--accent1);
+    box-shadow: 0 0 0 3px rgba(0,245,212,0.1);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent1), var(--accent3));
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 40px;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,245,212,0.3);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  /* SCREEN: QUIZ */
+  #screen-quiz { animation: fadeIn 0.5s ease; }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .player-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent1);
+    letter-spacing: 1px;
+  }
+
+  .score-display {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent4);
+  }
+
+  .timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .timer-num {
+    color: var(--accent1);
+    transition: color 0.3s;
+    min-width: 30px;
+    text-align: right;
+  }
+
+  .timer-num.urgent { color: var(--accent2); animation: pulse 0.5s ease infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent3));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .question-counter {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .question-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .question-category {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .question-text {
+    font-size: clamp(16px, 3vw, 20px);
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: var(--panel);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    line-height: 1.4;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent1);
+    background: rgba(0,245,212,0.05);
+    transform: translateY(-1px);
+  }
+
+  .option-btn.correct {
+    border-color: #00ff88;
+    background: rgba(0,255,136,0.1);
+    color: #00ff88;
+  }
+
+  .option-btn.wrong {
+    border-color: var(--accent2);
+    background: rgba(247,37,133,0.1);
+    color: var(--accent2);
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .option-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Feedback */
+  .feedback-box {
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+    animation: slideUp 0.3s ease;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct-fb { background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); color: #00ff88; }
+  .feedback-box.wrong-fb { background: rgba(247,37,133,0.1); border: 1px solid rgba(247,37,133,0.3); color: #ff6ba8; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .btn-next {
+    background: var(--panel);
+    border: 1.5px solid var(--accent3);
+    color: var(--accent3);
+    border-radius: 10px;
+    padding: 14px 30px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: none;
+    width: 100%;
+  }
+  .btn-next.show { display: block; }
+  .btn-next:hover { background: var(--accent3); color: white; }
+
+  /* Scoring flash */
+  .score-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    font-weight: 800;
+    pointer-events: none;
+    animation: scoreAnim 1s ease forwards;
+    z-index: 100;
+  }
+  @keyframes scoreAnim {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
+  }
+
+  /* SCREEN: RESULTS */
+  #screen-results {
+    text-align: center;
+    animation: fadeIn 0.8s ease;
+  }
+
+  .result-emoji {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 16px;
+    animation: bounce 1s ease infinite alternate;
+  }
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
+
+  .result-title {
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--accent4), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .result-score {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(48px, 10vw, 80px);
+    font-weight: 700;
+    color: var(--accent1);
+    margin: 20px 0;
+    text-shadow: 0 0 40px rgba(0,245,212,0.5);
+  }
+
+  .result-subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 30px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 12px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Ranking */
+  .ranking-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .ranking-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent4);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: background 0.2s;
+  }
+
+  .ranking-item.current { background: rgba(0,245,212,0.07); border: 1px solid rgba(0,245,212,0.2); }
+
+  .rank-pos {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    width: 30px;
+    text-align: center;
+  }
+
+  .rank-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .rank-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--accent1);
+    font-weight: 700;
+  }
+
+  .rank-medal { font-size: 20px; }
+
+  .hidden { display: none; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 500px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .rules-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="cytoskeleton-bg"></canvas>
+
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="screen-intro">
+    <span class="dna-icon">🧬</span>
+    <h1 class="main-title">CITOESQUELETO</h1>
+    <p class="subtitle">Quiz Interactivo · Biología Celular</p>
+
+    <div class="intro-card">
+      <h3>⚡ Evaluación</h3>
+      <div class="rules-grid">
+        <div class="rule-item"><span>🎯</span><span>10 preguntas sobre el citoesqueleto</span></div>
+        <div class="rule-item"><span>⏱️</span><span>20 segundos por pregunta</span></div>
+        <div class="rule-item"><span>🏆</span><span>+100 pts por respuesta correcta</span></div>
+        <div class="rule-item"><span>⚡</span><span>Bonus por responder rápido</span></div>
+      </div>
+    </div>
+
+    <div class="name-section">
+      <label class="name-label">Tu nombre</label>
+      <input type="text" class="name-input" id="player-name" placeholder="Escribí tu nombre..." maxlength="20">
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">¡EMPEZAR QUIZ!</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="hidden">
+    <div class="quiz-header">
+      <div class="player-name" id="header-name">Jugador</div>
+      <div class="score-display" id="score-display">0 pts</div>
+      <div class="timer-wrap">
+        <span>⏱</span>
+        <span class="timer-num" id="timer-num">20</span>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+
+    <div class="question-counter" id="question-counter">Pregunta 1 de 10</div>
+
+    <div class="question-card">
+      <span class="question-category" id="q-category">Componentes</span>
+      <p class="question-text" id="question-text">Cargando...</p>
+    </div>
+
+    <div class="options-grid" id="options-grid"></div>
+
+    <div class="feedback-box" id="feedback-box"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">Siguiente pregunta →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="hidden">
+    <span class="result-emoji" id="result-emoji">🏆</span>
+    <h2 class="result-title" id="result-title">¡Excelente!</h2>
+    <div class="result-score" id="result-score">850 pts</div>
+    <p class="result-subtitle" id="result-subtitle">Sos un experto en citoesqueleto</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent1)" id="stat-correct">0</div>
+        <div class="stat-label">Correctas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent2)" id="stat-wrong">0</div>
+        <div class="stat-label">Incorrectas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent4)" id="stat-accuracy">0%</div>
+        <div class="stat-label">Precisión</div>
+      </div>
+    </div>
+
+    <div class="ranking-section">
+      <div class="ranking-title">🏆 Ranking de la sesión</div>
+      <div id="ranking-list"></div>
+    </div>
+
+    <button class="btn-primary" onclick="restartGame()">¡JUGAR DE NUEVO!</button>
+  </div>
+
+</div>
+
+<script>
+// ========== CYTOSKELETON BACKGROUND ==========
+const canvas = document.getElementById('cytoskeleton-bg');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Filament types matching the 3 cytoskeleton components
+const FILAMENT_TYPES = [
+  { color: '0,220,80',   width: 1.2, speed: 0.3, name: 'micro' },    // microtubules - verde
+  { color: '150,50,250', width: 0.7, speed: 0.5, name: 'inter' },    // intermediate - violeta
+  { color: '255,140,0',  width: 0.5, speed: 0.7, name: 'actin' },    // actin - naranja
+];
+
+// Nodes (like protein complexes / branching points)
+class Node {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * window.innerWidth;
+    this.y = Math.random() * window.innerHeight;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.type = FILAMENT_TYPES[Math.floor(Math.random() * FILAMENT_TYPES.length)];
+    this.radius = 1.5 + Math.random() * 2;
+    this.pulse = Math.random() * Math.PI * 2;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.pulse += 0.03;
+    if (this.x < -50 || this.x > window.innerWidth + 50 ||
+        this.y < -50 || this.y > window.innerHeight + 50) {
+      this.reset();
+    }
+  }
+}
+
+// Motor proteins - tiny dots that travel along filaments
+class MotorProtein {
+  constructor(nodeA, nodeB) {
+    this.nodeA = nodeA;
+    this.nodeB = nodeB;
+    this.t = 0;
+    this.speed = 0.003 + Math.random() * 0.005;
+    this.color = nodeA.type.color;
+  }
+  update() { this.t += this.speed; }
+  isDone() { return this.t >= 1; }
+  draw() {
+    const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.t;
+    const y = this.nodeA.y + (this.nodeB.y - this.nodeA.y) * this.t;
+    ctx.beginPath();
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color}, 0.9)`;
+    ctx.fill();
+    // glow
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color}, 0.2)`;
+    ctx.fill();
+  }
+}
+
+const NUM_NODES = 80;
+const nodes = Array.from({ length: NUM_NODES }, () => new Node());
+const motors = [];
+const MAX_DIST = 160;
+
+let frameCount = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  frameCount++;
+
+  // Draw filaments between nearby nodes
+  for (let i = 0; i < nodes.length; i++) {
+    nodes[i].update();
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < MAX_DIST && nodes[i].type === nodes[j].type) {
+        const alpha = (1 - dist / MAX_DIST) * 0.4;
+        const t = nodes[i].type;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        // Slight curve for organic feel
+        const mx = (nodes[i].x + nodes[j].x) / 2 + Math.sin(frameCount * 0.01 + i) * 10;
+        const my = (nodes[i].y + nodes[j].y) / 2 + Math.cos(frameCount * 0.01 + j) * 10;
+        ctx.quadraticCurveTo(mx, my, nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(${t.color}, ${alpha})`;
+        ctx.lineWidth = t.width;
+        ctx.stroke();
+
+        // Spawn motor protein occasionally
+        if (frameCount % 120 === 0 && Math.random() < 0.1 && motors.length < 30) {
+          motors.push(new MotorProtein(nodes[i], nodes[j]));
+        }
+      }
+    }
+  }
+
+  // Draw nodes (protein complexes)
+  for (const node of nodes) {
+    const pulse = Math.sin(node.pulse) * 0.5 + 1;
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.radius * pulse, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${node.type.color}, 0.6)`;
+    ctx.fill();
+  }
+
+  // Update and draw motor proteins
+  for (let i = motors.length - 1; i >= 0; i--) {
+    motors[i].update();
+    motors[i].draw();
+    if (motors[i].isDone()) motors.splice(i, 1);
+  }
+}
+
+animate();
+</script>
+
+<script>
+const questions = [
+  {
+    category: "Componentes",
+    categoryColor: "#00f5d4",
+    question: "¿Cuál es el componente del citoesqueleto con mayor diámetro (25 nm)?",
+    options: ["Microfilamentos de actina", "Microtúbulos", "Filamentos intermedios", "Filamentos de miosina"],
+    correct: 1,
+    explanation: "Los microtúbulos tienen 25 nm de diámetro y están formados por dímeros de α y β-tubulina. Son los más grandes del citoesqueleto."
+  },
+  {
+    category: "Proteínas Motoras",
+    categoryColor: "#7b2ff7",
+    question: "La kinesina se mueve sobre los microtúbulos hacia el extremo...",
+    options: ["(-) negativo, hacia el centrosoma", "(+) positivo, hacia la periferia", "En ambas direcciones", "No se mueve, es estática"],
+    correct: 1,
+    explanation: "¡Correcto! La kinesina se mueve hacia el extremo (+) de los microtúbulos, transportando vesículas y organelos desde el centro hacia la periferia celular."
+  },
+  {
+    category: "Componentes",
+    categoryColor: "#00f5d4",
+    question: "¿Qué proteína forma los microfilamentos del citoesqueleto?",
+    options: ["Tubulina", "Queratina", "Actina", "Vimentina"],
+    correct: 2,
+    explanation: "Los microfilamentos están formados por actina globular (G-actina) que se polimeriza formando actina filamentosa (F-actina). Son los más delgados (7 nm)."
+  },
+  {
+    category: "Funciones",
+    categoryColor: "#f72585",
+    question: "Durante la mitosis, ¿qué estructura del citoesqueleto forma el huso mitótico para separar los cromosomas?",
+    options: ["Microfilamentos de actina", "Filamentos intermedios", "Microtúbulos", "Filamentos de miosina"],
+    correct: 2,
+    explanation: "¡Exacto! Los microtúbulos forman el huso mitótico, que se ancla a los cinetocoros de los cromosomas y los separa hacia los polos celulares durante la mitosis."
+  },
+  {
+    category: "Proteínas Motoras",
+    categoryColor: "#7b2ff7",
+    question: "¿Qué proteína motora es responsable del movimiento de cilios y flagelos?",
+    options: ["Kinesina", "Miosina II", "Dineína", "Cofilina"],
+    correct: 2,
+    explanation: "La dineína es la proteína motora que genera el movimiento de deslizamiento entre microtúbulos en cilios y flagelos. También transporta cargas hacia el extremo (-) de los microtúbulos."
+  },
+  {
+    category: "Componentes",
+    categoryColor: "#00f5d4",
+    question: "Los neurofilamentos son un tipo de...",
+    options: ["Microtúbulos", "Microfilamentos", "Filamentos intermedios", "Filamentos de actina"],
+    correct: 2,
+    explanation: "Los neurofilamentos son filamentos intermedios (10 nm) específicos de las neuronas. Proporcionan soporte estructural al axón y determinan su calibre."
+  },
+  {
+    category: "Funciones",
+    categoryColor: "#f72585",
+    question: "¿Cuál es el proceso que permite que la célula cambie de forma y migre?",
+    options: ["Polimerización y despolimerización de actina", "Síntesis de tubulina nueva", "Degradación de filamentos intermedios", "Fosforilación de miosina"],
+    correct: 0,
+    explanation: "¡Exacto! La polimerización dinámica de la actina en el frente celular y la despolimerización en la parte trasera permiten la migración celular mediante la formación de lamelipodios y filópodos."
+  },
+  {
+    category: "Proteínas Motoras",
+    categoryColor: "#7b2ff7",
+    question: "La miosina II interactúa con los microfilamentos de actina para generar...",
+    options: ["Transporte de vesículas al núcleo", "Contracción muscular y división celular", "Formación del huso mitótico", "Movimiento de cilios"],
+    correct: 1,
+    explanation: "La miosina II 'camina' sobre los filamentos de actina usando energía del ATP, generando fuerza para la contracción muscular. También forma el anillo contráctil durante la citocinesis."
+  },
+  {
+    category: "Funciones",
+    categoryColor: "#f72585",
+    question: "¿Qué componente del citoesqueleto ancla el núcleo y mantiene la forma del mismo?",
+    options: ["Microtúbulos citoplasmáticos", "Microfilamentos de actina cortical", "Filamentos intermedios (lámina nuclear)", "Fibras de estrés de actina"],
+    correct: 2,
+    explanation: "Los filamentos intermedios forman la lámina nuclear (formada por laminas A, B y C), que recubre internamente la envoltura nuclear y ancla el núcleo a la célula."
+  },
+  {
+    category: "Componentes",
+    categoryColor: "#00f5d4",
+    question: "¿Cuál es el rango de diámetro de los filamentos intermedios?",
+    options: ["Entre 1 y 5 nm", "Entre 7 y 11 nm", "Entre 20 y 30 nm", "Entre 50 y 100 nm"],
+    correct: 1,
+    explanation: "Los filamentos intermedios tienen un diámetro de entre 7 y 11 nm, lo que los sitúa entre los microfilamentos (7 nm) y los microtúbulos (25 nm), de ahí su nombre 'intermedios'."
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let timerInterval = null;
+let timeLeft = 20;
+let answered = false;
+let playerName = '';
+let sessionRanking = [];
+
+function startGame() {
+  playerName = document.getElementById('player-name').value.trim() || 'Jugador';
+  currentQuestion = 0;
+  score = 0;
+  correctCount = 0;
+  wrongCount = 0;
+
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  document.getElementById('header-name').textContent = playerName;
+  updateScore();
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = questions[currentQuestion];
+
+  document.getElementById('question-counter').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+  document.getElementById('progress-fill').style.width = `${(currentQuestion / questions.length) * 100}%`;
+
+  const catEl = document.getElementById('q-category');
+  catEl.textContent = q.category;
+  catEl.style.background = q.categoryColor + '22';
+  catEl.style.color = q.categoryColor;
+  catEl.style.border = `1px solid ${q.categoryColor}44`;
+
+  document.getElementById('question-text').textContent = q.question;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback-box');
+  fb.classList.remove('show', 'correct-fb', 'wrong-fb');
+
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.classList.remove('show');
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 20;
+  updateTimer();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  const el = document.getElementById('timer-num');
+  el.textContent = timeLeft;
+  if (timeLeft <= 5) el.classList.add('urgent');
+  else el.classList.remove('urgent');
+}
+
+function timeOut() {
+  answered = true;
+  wrongCount++;
+  const q = questions[currentQuestion];
+  const btns = document.querySelectorAll('.option-btn');
+  btns[q.correct].classList.add('correct');
+  btns.forEach(b => b.disabled = true);
+
+  showFeedback(false, `⏰ ¡Tiempo! La respuesta correcta era: <b>${q.options[q.correct]}</b>. ${q.explanation}`);
+  document.getElementById('btn-next').classList.add('show');
+}
+
+function selectAnswer(index) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const q = questions[currentQuestion];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (index === q.correct) {
+    btns[index].classList.add('correct');
+    const bonus = Math.floor(timeLeft * 5);
+    const gained = 100 + bonus;
+    score += gained;
+    correctCount++;
+    updateScore();
+    showScoreFlash(`+${gained}`);
+    showFeedback(true, `✅ ¡Correcto! +${gained} pts (incluye bonus de velocidad). ${q.explanation}`);
+  } else {
+    btns[index].classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    wrongCount++;
+    showFeedback(false, `❌ Incorrecto. La respuesta era: <b>${q.options[q.correct]}</b>. ${q.explanation}`);
+  }
+
+  document.getElementById('btn-next').classList.add('show');
+}
+
+function showFeedback(isCorrect, text) {
+  const fb = document.getElementById('feedback-box');
+  fb.innerHTML = text;
+  fb.className = `feedback-box show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+}
+
+function showScoreFlash(text) {
+  const el = document.createElement('div');
+  el.className = 'score-flash';
+  el.textContent = text;
+  el.style.color = '#00f5d4';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = `${score} pts`;
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= questions.length) {
+    showResults();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-results').classList.remove('hidden');
+
+  const accuracy = Math.round((correctCount / questions.length) * 100);
+
+  document.getElementById('result-score').textContent = `${score} pts`;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
+
+  let emoji, title, subtitle;
+  if (accuracy >= 90) { emoji = '🏆'; title = '¡MAESTRO DEL CITOESQUELETO!'; subtitle = 'Conocés el citoesqueleto mejor que tus propias células.'; }
+  else if (accuracy >= 70) { emoji = '🧬'; title = '¡Muy bien!'; subtitle = 'Tenés un excelente dominio del tema.'; }
+  else if (accuracy >= 50) { emoji = '💪'; title = '¡Buen intento!'; subtitle = 'Seguís aprendiendo, ¡vas por buen camino!'; }
+  else { emoji = '📚'; title = 'A estudiar más...'; subtitle = 'El citoesqueleto te espera. ¡Volvé a intentarlo!'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-subtitle').textContent = subtitle;
+
+  // Add to ranking
+  sessionRanking.push({ name: playerName, score, accuracy });
+  sessionRanking.sort((a, b) => b.score - a.score);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const rankList = document.getElementById('ranking-list');
+  rankList.innerHTML = '';
+
+  sessionRanking.slice(0, 5).forEach((player, i) => {
+    const isCurrent = player.name === playerName && player.score === score;
+    const item = document.createElement('div');
+    item.className = `ranking-item${isCurrent ? ' current' : ''}`;
+    item.innerHTML = `
+      <span class="rank-pos" style="color:${i === 0 ? '#ffd60a' : i === 1 ? '#aaa' : i === 2 ? '#cd7f32' : 'var(--muted)'}">${medals[i] || `#${i+1}`}</span>
+      <span class="rank-name">${player.name}${isCurrent ? ' 👈' : ''}</span>
+      <span class="rank-score">${player.score} pts</span>
+    `;
+    rankList.appendChild(item);
+  });
+}
+
+function restartGame() {
+  document.getElementById('screen-results').classList.add('hidden');
+  document.getElementById('screen-intro').classList.remove('hidden');
+  document.getElementById('player-name').value = playerName;
+}
+</script>
+</body>
+</html>
